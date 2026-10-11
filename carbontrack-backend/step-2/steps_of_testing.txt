@@ -1,0 +1,39 @@
+Register (POST) -> http://localhost:8090/api/auth/register
+
+Authorization  ->  No Auth
+
+Body  ->  {
+  "username": "siva",
+  "email": "siva@test.com",
+  "password": "siva@123!"
+}
+
+
+Login (POST) -> http://localhost:8090/api/auth/login
+
+Authorization: No Auth
+
+Body → raw → JSON:
+
+json
+{
+  "username": "siva",
+  "password": "siva@123!"
+}
+
+
+Profile(using token)(GET)
+
+Authorization: Bearer Token
+
+send
+
+Profile update (PUT)
+URL: http://localhost:8090/api/users/me
+Authorization: Bearer Token (same token)
+Body → raw → JSON:
+json
+{
+  "preferredUnitSystem": "IMPERIAL",
+  "goalsVisible": false
+}
