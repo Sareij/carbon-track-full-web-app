@@ -1,0 +1,183 @@
+step-3 in milestone 1
+Step 3 = calculator (engine) + rate board. 
+
+Calculation correct-a 
+if the input is wrong app should reject it or not.
+Admin only change the  rate-a , if so code will not change but  result will change.
+
+
+
+Step 1: Login(POST)
+http://localhost:8090/api/auth/login
+Body -> json
+{ 
+"username": "saranya",
+ "password": "Pass1234!" 
+}
+
+send
+
+copy the token
+
+Step 2:For each request put the token 
+
+Authorization:Bearer Token.
+
+paste the token
+
+send
+
+Step 3: Test 1 (factors list)
+
+Method GET
+
+http://localhost:8090/api/emission-factors?category=TRANSPORT
+
+Authorization → Bearer Token → paste.
+
+Send → 200 OK, 7 factors.
+
+Eg: We can check how much CO₂ a car produces per kilometre.
+
+Step 4: Test 2 (calculate)
+
+Method POST
+
+URL: http://localhost:8090/api/emissions/calculate
+
+Authorization → Bearer Token → paste.
+
+Body → raw → JSON:
+
+json
+{ "activityType": "CAR_PETROL", "unit": "KM", "quantity": 10 }
+
+
+Send 
+
+expected 200 ok
+
+{
+  "category": "TRANSPORT",
+  "activityType": "CAR_PETROL",
+  "unit": "KM",
+  "quantity": 10,
+  "kgCo2ePerUnit": 0.192000,
+  "co2eKg": 1.9200,
+  "factorId": 1,
+  "factorSource": "Illustrative (EPA/IPCC based)",
+  "factorEffectiveDate": "2024-01-01"
+}
+
+(10 × 0.192) => 1.9200
+Eg: Distance = 10 km
+Car emission rate = 0.192 kg CO₂e per km
+Calculation = 10 × 0.192 = 1.92 kg CO₂e
+
+Test 3: Wrong testcases
+
+{"activityType":"ROCKET","unit":"KM","quantity":10}
+
+expected : 400, “No active emission factor...”
+
+{"activityType":"CAR_PETROL","unit":"KM","quantity":-5}
+
+expected: 400, “Quantity must not be negative”
+
+
+Test 4: Security
+
+4a. Without Token  
+
+GET http://localhost:8090/api/emission-factors
+
+Authorization tab → No Auth
+
+Send → 401 "Authentication required or token invalid/expired"
+
+
+4b.USER has no access for admin
+
+GET http://localhost:8090/api/admin/emission-factors
+
+Authorization → Bearer Token → our token
+
+Send → 403 "You do not have permission to access this resource"
+
+Test 5: Admin demo
+
+5.1. now user changed a role to admin
+
+UPDATE carbontrack.users SET role = 'ADMIN' WHERE id = 1;
+
+in MySQL workbench
+
+5.2. take new token. again sent a login request copy the token
+
+5.4. new  rate add. POST 
+
+http://localhost:8090/api/admin/emission-factor
+
+ Body raw JSON:
+
+{
+  "category": "TRANSPORT",
+  "activityType": "CAR_PETROL",
+  "unit": "KM",
+  "kgCo2ePerUnit": 0.200000,
+  "source": "Demo update",
+  "effectiveDate": "2026-10-10"
+}
+
+→ 201 Created. Response-la "id": 20 will come,  note this 
+
+
+Step 5.4: new rate add
+
+method POST
+
+URL: http://localhost:8090/api/admin/emission-factors
+Authorization → Bearer Token → unga admin token paste.
+Body → raw → JSON:
+json
+{
+  "category": "TRANSPORT",
+  "activityType": "CAR_PETROL",
+  "unit": "KM",
+  "kgCo2ePerUnit": 0.200000,
+  "source": "Demo update",
+  "effectiveDate": "2026-10-10"
+}
+Send.
+
+Expected: 201 Created, response-la "id": 20
+
+Step 5.5: again calculate (this is  demo highlight)
+http://localhost:8090/api/emissions/calculate   POST
+
+{ "activityType": "CAR_PETROL", "unit": "KM", "quantity": 10 }
+
+before: co2eKg: 1.9200, factorId: 1
+after: co2eKg: 2.0000, factorId: 20
+
+Step 5.6: Duplicate test
+
+Demo row-a off it
+
+PUT http://localhost:8090/api/admin/emission-factors/20 (our id), 
+Body:
+
+json
+{ "active": false }
+
+→ 200 OK, "active": false.
+
+Step 5.8: again calculate
+
+Same calculate request → 1.9200 (previous rate-ku came).
+
+Answer 1.92 → 2.0 → 1.92 changed 
+
+
+ 
+

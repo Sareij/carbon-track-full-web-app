@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: carbontrack-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: carbontrack
+      MYSQL_USER: carbon
+      MYSQL_PASSWORD: carbon123
+      MYSQL_ROOT_PASSWORD: root123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  mysql_data:

@@ -1,3 +1,5 @@
+step-2 in milestone 1 
+
 Register (POST) -> http://localhost:8090/api/auth/register
 
 Authorization  ->  No Auth
